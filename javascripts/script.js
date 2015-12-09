@@ -10,10 +10,6 @@ var defaultValues = {
 
 $(document).ready(function(){
     $("#userInput").on('input',newBarcode);
-    $("#barcodeType").change(function(){
-        $("#userInput").val( defaultValues[$(this).val()] );
-        newBarcode();
-    });
     $("input:radio[name=display-value]").click(newBarcode);
     newBarcode();
 
@@ -30,23 +26,23 @@ $(document).ready(function(){
 var newBarcode = function() {
     //Convert to boolean
     var displayValue = ($("input:radio[name=display-value]:checked").val() === "true");
-    $("#barcode").JsBarcode(
-        $("#userInput").val(),{
-            "format":$("#barcodeType").val(),
-            "backgroundColor":"#fff",
-            "fontSize":parseInt($("#bar-fontSize").val()),
-            "height":parseInt($("#bar-height").val()),
-            "width":$("#bar-width").val(),
-            "displayValue":displayValue
-        },
-        function(valid){
-            if(valid){
-                $("#invalid").stop().fadeTo(300,0);
-            }
-            else{
-                $("#invalid").stop().fadeTo(300,1);
-            }
-        });
+    var barcodes = $("#userInput").val().split("\n");
+    var options = {
+        "format": "CODE128",
+        "backgroundColor": "#fff",
+        "fontSize": parseInt($("#bar-fontSize").val()),
+        "height": parseInt($("#bar-height").val()),
+        "width": $("#bar-width").val(),
+        "displayValue": displayValue
+    };
+    var html = [];
+    for (var i = 0, l = barcodes.length; i < l; ++i) {
+        var imgData = $("#barcode").JsBarcode(barcodes[i], options).attr("src");
+        if (imgData) {
+            html.push("<p><img id='barcode' src='" + imgData + "'></p>");
+        };
+    };
+    $("#barcode-list").html(html);
 
     $("#bar-width-display").text($("#bar-width").val());
     $("#bar-height-display").text($("#bar-height").val());
